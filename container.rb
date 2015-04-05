@@ -14,7 +14,7 @@ module Container
   end
 
   def delete
-    self.class.send :delete, self
+    self.class.delete self
   end
 
   module ClassMethods

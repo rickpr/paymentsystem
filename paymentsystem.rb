@@ -65,9 +65,11 @@ module PaymentSystem
   class Employee < User
   
     attr_accessor :wage
+    attr_reader :paid
   
     def initialize name, password, wage
       @wage       = wage.to_f
+      @paid       = 0.0
       super name, password
     end
   
@@ -76,7 +78,20 @@ module PaymentSystem
     end
 
     def pay
-      pay! time_cards.select { |card| card.date <= last_pay_day }
+      cards =  time_cards.select { |card| card.date <= last_pay_day }
+      @paid += pay! cards, hours(cards)
+    end
+
+    def hours cards
+      cards.map(&:hours).reduce :+
+    end
+
+    def pay! cards = time_cards, total_hours = hours(time_cards), amount = wage
+      cards.each do |card|
+        card.project.reduce_funds amount * card.hours / total_hours
+        card.delete
+      end
+      amount
     end
   
     def fire!
@@ -108,14 +123,6 @@ module PaymentSystem
   
   class SalariedEmployee < Employee
 
-    def pay! cards = time_cards
-      total_hours = cards.map(&:hours).reduce :+
-      cards.each do |card|
-        card.project.reduce_funds wage * card.hours / total_hours
-        card.delete
-      end
-    end
-
     def last_pay_day
       PaymentSystem.configuration.salary_pay_day
     end
@@ -124,11 +131,11 @@ module PaymentSystem
   
   class HourlyEmployee < Employee
 
-    def pay! cards = time_cards
-      cards.each do |card|
-        card.project.reduce_funds wage * card.hours
-        card.delete
-      end
+    def pay! cards = time_cards, total_hours = hours(time_cards)
+      adjusted_hours = total_hours 
+      adjusted_hours += (total_hours > 40) ? 0.5 * (total_hours - 40) : 0
+      amount = wage * adjusted_hours
+      super cards, total_hours, amount
     end
 
     def last_pay_day
@@ -147,6 +154,7 @@ module PaymentSystem
       @name      = name
       @funds     = funds.to_f
       add_observer manager
+      unique :name
       super()
     end
     
