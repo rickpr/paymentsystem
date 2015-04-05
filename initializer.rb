@@ -1,3 +1,5 @@
+#!/usr/bin/env ruby
+require 'io/console'
 require './routine'
 
 PaymentSystem.configure do |config|

@@ -22,7 +22,7 @@ module PaymentSystem
     private
 
     def login
-      puts "Welcome to PaymentSystem. Please log in."
+      puts File.read "header" 
       role = login_type
       check_credentials role
     end
