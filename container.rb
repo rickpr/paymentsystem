@@ -4,7 +4,7 @@ module Container
 
   def initialize
     @duplicates ||= []
-    self.class.send :create, self
+    self.class.create self
   end
 
   def unique *attributes
@@ -21,9 +21,8 @@ module Container
 
     attr_reader :all
 
-    private 
-
     def create item
+      return warn "Must be a #{self}" unless item.class == self
       if all.include? item
         warn "Already exists."
       elsif item.duplicates.any?
@@ -32,7 +31,7 @@ module Container
         all.push item
       end
     end
-  
+
     def delete item
       all.delete item
     end

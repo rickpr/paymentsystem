@@ -38,7 +38,7 @@ module PaymentSystem
     end
 
     def update project, amount
-      puts "#{project} is #{-amount} over budget!"
+      puts "#{project} is $#{-amount} over budget!"
     end
 
 
@@ -152,7 +152,8 @@ module PaymentSystem
     
     def reduce_funds amount
       @funds -= amount
-      notify_observers(@name, @funds) if @funds < 0
+      changed if @funds < 0
+      notify_observers @name, @funds
     end
   
   end

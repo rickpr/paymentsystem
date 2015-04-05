@@ -72,7 +72,7 @@ module PaymentSystem
       print "Enter day of time card: "
       day = gets.chomp
       print "Select a project: "
-      project = optionize Project.all
+      project = optionize Project.all, Project.all.map(&:name)
       print "Enter hours worked: "
       hours = gets.chomp
       TimeCard.new user, project, hours, Date.parse([year,month,day].join "-")
@@ -120,8 +120,8 @@ module PaymentSystem
       employee.fire!
     end
 
-    def optionize items
-      items.each.with_index(1) { |item,index| puts "#{index}: #{item}"}
+    def optionize items, display = items
+      display.each.with_index(1) { |item,index| puts "#{index}: #{item}"}
       print ">"
       items[gets.chomp.to_i - 1]
     end
