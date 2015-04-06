@@ -29,7 +29,6 @@ module PaymentSystem
   
     attr_reader :name, :password
 
-  
     def initialize name, password
       @name = name
       @password = Password.new password
@@ -79,7 +78,7 @@ module PaymentSystem
 
     def pay
       cards =  time_cards.select { |card| card.date <= last_pay_day }
-      @paid += pay! cards, hours(cards)
+      pay! cards, hours(cards)
     end
 
     def hours cards
@@ -91,7 +90,7 @@ module PaymentSystem
         card.project.reduce_funds amount * card.hours / total_hours
         card.delete
       end
-      amount
+      @paid += amount
     end
   
     def fire!
